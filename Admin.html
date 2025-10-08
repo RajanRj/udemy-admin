@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Course Management</title>
+    <style>
+        :root {
+            --dark-navy-grey: #2F4156;
+            --container-bg: #3B526B;
+            --light-text: #ECF0F1;
+            --accent-orange: #FFA07A;
+            --accent-orange-hover: #FF8C00;
+            --input-bg: #4A637C;
+            --input-border: #5C7896;
+            --list-item-bg: #4A637C;
+            --list-item-border: #5C7896;
+            --delete-btn-bg: #E74C3C;
+            --delete-btn-hover: #C0392B;
+            --success-bg: #D4EDDA;
+            --success-color: #155724;
+            --error-bg: #F8D7DA;
+            --error-color: #721C24;
+            --link-color: #FFDAB9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--dark-navy-grey);
+            color: var(--light-text);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background-color: var(--container-bg);
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        h1, h2, h3 {
+            color: var(--accent-orange);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        h1 { font-size: 2.5em; }
+        h2 { font-size: 2em; }
+        h3 { font-size: 1.5em; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--input-border);
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .auth-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--list-item-bg);
+            border: 1px solid var(--list-item-border);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--light-text);
+        }
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        input[type="url"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            background-color: var(--input-bg);
+            color: var(--light-text);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(255, 160, 122, 0.3);
+        }
+        button {
+            background-color: var(--accent-orange);
+            color: var(--dark-navy-grey);
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            background-color: var(--accent-orange-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .btn-logout {
+            background-color: var(--delete-btn-bg);
+            color: var(--light-text);
+            margin-left: 10px;
+        }
+        .btn-logout:hover {
+            background-color: var(--delete-btn-hover);
+            color: var(--light-text);
+        }
+        .section-title {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--input-border);
+        }
+        .list-container ul {
+            list-style: none;
+            padding: 0;
+        }
+        .list-container li {
+            background-color: var(--list-item-bg);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border: 1px solid var(--list-item-border);
+        }
+        .list-container li span {
+            flex-grow: 1;
+            padding-right: 15px;
+            color: var(--light-text);
+        }
+        .list-container li img {
+            height: 24px;
+            width: 24px;
+            vertical-align: middle;
+            margin-left: 8px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--accent-orange);
+        }
+        .list-container li button {
+            margin-left: 10px;
+            background-color: var(--delete-btn-bg);
+            color: var(--light-text);
+            padding: 8px 15px;
+            font-weight: normal;
+            font-size: 0.9em;
+            box-shadow: none;
+        }
+        .list-container li button:hover {
+            background-color: var(--delete-btn-hover);
+            transform: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            animation: fadeInOut 3s forwards;
+        }
+        .status-message.success {
+            background-color: var(--success-bg);
+            color: var(--success-color);
+            border: 1px solid var(--success-bg);
+        }
+        .status-message.error {
+            background-color: var(--error-bg);
+            color: var(--error-color);
+            border: 1px solid var(--error-bg);
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container {
+                padding: 15px;
+                border-radius: 8px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header h1 {
+                font-size: 2em;
+                margin-bottom: 10px;
+            }
+            .list-container li {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 12px;
+            }
+            .list-container li span {
+                padding-right: 0;
+                margin-bottom: 10px;
+            }
+            .list-container li button {
+                margin-top: 10px;
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.6em; }
+            h3 { font-size: 1.3em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Admin Dashboard</h1>
+            <div id="authStatus">
+                <span id="loggedInUserEmail">Not logged in</span>
+                <button id="logoutBtn" class="btn-logout" style="display: none;">Logout</button>
+            </div>
+        </div>
+
+        <div class="auth-section" id="authSection">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <label for="adminEmail">Email:</label>
+                <input type="email" id="adminEmail" placeholder="admin@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="adminPassword">Password:</label>
+                <input type="password" id="adminPassword" placeholder="password" required>
+            </div>
+            <button id="loginBtn">Login</button>
+            <div id="authMessage" class="status-message" style="display: none;"></div>
+        </div>
+
+        <div id="adminContent" style="display: none;">
+            <h2 class="section-title">Manage Course Categories</h2>
+            <div class="form-group">
+                <label for="categoryName">Category Name:</label>
+                <input type="text" id="categoryName" placeholder="e.g., Web Development" required>
+            </div>
+            <div class="form-group">
+                <label for="categoryIconUrl">Icon URL (optional):</label>
+                <input type="url" id="categoryIconUrl" placeholder="e.g., https://example.com/icon.png">
+            </div>
+            <button id="addCategoryBtn">Add Category</button>
+            <div id="categoryMessage" class="status-message" style="display: none;"></div>
+
+            <h3 class="section-title">Existing Categories</h3>
+            <div class="list-container">
+                <ul id="categoriesList">
+                    <!-- Categories will be loaded here -->
+                </ul>
+            </div>
+
+            <h2 class="section-title">Manage Courses</h2>
+            <div class="form-group">
+                <label for="courseTitle">Course Title:</label>
+                <input type="text" id="courseTitle" placeholder="e.g., Senior Frontend Developer" required>
+            </div>
+            <div class="form-group">
+                <label for="courseDescription">Description:</label>
+                <textarea id="courseDescription" rows="3" placeholder="Brief description of the course"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="courseUrl">Course Link:</label>
+                <input type="url" id="courseUrl" placeholder="e.g., https://udemy.com/course/123" required>
+            </div>
+            <div class="form-group">
+                <label for="courseCategory">Category:</label>
+                <select id="courseCategory" required>
+                    <option value="">Select a Category</option>
+                    <!-- Categories will be loaded here dynamically -->
+                </select>
+            </div>
+            <button id="addCourseBtn">Add Course</button>
+            <div id="courseMessage" class="status-message" style="display: none;"></div>
+
+            <h3 class="section-title">Existing Courses</h3>
+            <div class="list-container">
+                <ul id="coursesList">
+                    <!-- Courses will be loaded here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDL23I_DM7Ml85FE94okN9gBO8im6ELE_Q",
+          authDomain: "course-3b4dc.firebaseapp.com",
+          databaseURL: "https://course-3b4dc-default-rtdb.firebaseio.com",
+          projectId: "course-3b4dc",
+          storageBucket: "course-3b4dc.firebasestorage.app",
+          messagingSenderId: "602409979247",
+          appId: "1:602409979247:web:d3250dcebed63ad93a6c9a",
+          measurementId: "G-GXZ7G2L2NS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // --- DOM Elements ---
+        const authSection = document.getElementById('authSection');
+        const adminEmailInput = document.getElementById('adminEmail');
+        const adminPasswordInput = document.getElementById('adminPassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const authMessage = document.getElementById('authMessage');
+        const adminContent = document.getElementById('adminContent');
+        const loggedInUserEmail = document.getElementById('loggedInUserEmail');
+
+        const categoryNameInput = document.getElementById('categoryName');
+        const categoryIconUrlInput = document.getElementById('categoryIconUrl');
+        const addCategoryBtn = document.getElementById('addCategoryBtn');
+        const categoryMessage = document.getElementById('categoryMessage');
+        const categoriesList = document.getElementById('categoriesList');
+        const courseCategorySelect = document.getElementById('courseCategory');
+
+        const courseTitleInput = document.getElementById('courseTitle');
+        const courseDescriptionInput = document.getElementById('courseDescription');
+        const courseUrlInput = document.getElementById('courseUrl');
+        const addCourseBtn = document.getElementById('addCourseBtn');
+        const courseMessage = document.getElementById('courseMessage');
+        const coursesList = document.getElementById('coursesList');
+
+        // --- Firebase Auth Logic ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authSection.style.display = 'none';
+                adminContent.style.display = 'block';
+                loggedInUserEmail.textContent = `Logged in as: ${user.email}`;
+                logoutBtn.style.display = 'inline-block';
+                loadCategories();
+                loadCourses();
+            } else {
+                authSection.style.display = 'block';
+                adminContent.style.display = 'none';
+                loggedInUserEmail.textContent = 'Not logged in';
+                logoutBtn.style.display = 'none';
+            }
+        });
+
+        loginBtn.addEventListener('click', async () => {
+            const email = adminEmailInput.value;
+            const password = adminPasswordInput.value;
+
+            if (!email || !password) {
+                showMessage(authMessage, 'Please enter both email and password.', 'error');
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showMessage(authMessage, 'Logged in successfully!', 'success');
+                adminEmailInput.value = '';
+                adminPasswordInput.value = '';
+            } catch (error) {
+                showMessage(authMessage, `Login failed: ${error.message}`, 'error');
+                console.error("Login error:", error);
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                showMessage(authMessage, 'Logged out successfully!', 'success');
+            } catch (error) {
+                showMessage(authMessage, `Logout failed: ${error.message}`, 'error');
+                console.error("Logout error:", error);
+            }
+        });
+
+        // --- Firebase Database Logic ---
+
+        // Add Category
+        addCategoryBtn.addEventListener('click', async () => {
+            const name = categoryNameInput.value.trim();
+            const iconUrl = categoryIconUrlInput.value.trim();
+
+            if (!name) {
+                showMessage(categoryMessage, 'Category name cannot be empty.', 'error');
+                return;
+            }
+
+            try {
+                const categoriesRef = ref(database, 'categories');
+                await push(categoriesRef, {
+                    name: name,
+                    iconUrl: iconUrl || ''
+                });
+                showMessage(categoryMessage, 'Category added successfully!', 'success');
+                categoryNameInput.value = '';
+                categoryIconUrlInput.value = '';
+            } catch (error) {
+                showMessage(categoryMessage, `Failed to add category: ${error.message}`, 'error');
+                console.error("Add category error:", error);
+            }
+        });
+
+        // Load Categories
+        const categoriesRef = ref(database, 'categories');
+        onValue(categoriesRef, (snapshot) => {
+            categoriesList.innerHTML = '';
+            courseCategorySelect.innerHTML = '<option value="">Select a Category</option>';
+            snapshot.forEach((childSnapshot) => {
+                const category = childSnapshot.val();
+                const categoryId = childSnapshot.key;
+
+                // Add to admin category list
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${category.name} ${category.iconUrl ? `<img src="${category.iconUrl}" alt="icon">` : ''}</span>
+                    <button data-id="${categoryId}">Delete</button>
+                `;
+                categoriesList.appendChild(li);
+
+                // Add to course category dropdown
+                const option = document.createElement('option');
+                option.value = categoryId;
+                option.textContent = category.name;
+                courseCategorySelect.appendChild(option);
+            });
+        });
+
+        // Delete Category
+        categoriesList.addEventListener('click', async (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const categoryId = e.target.dataset.id;
+                if (confirm('Are you sure you want to delete this category? All associated courses will also be deleted.')) {
+                    try {
+                        // Delete category
+                        await remove(ref(database, `categories/${categoryId}`));
+
+                        // Delete associated courses (this is a simple approach, for large datasets, a cloud function might be better)
+                        const coursesRef = ref(database, 'courses');
+                        onValue(coursesRef, (snapshot) => {
+                            snapshot.forEach(async (childSnapshot) => {
+                                const course = childSnapshot.val();
+                                if (course.categoryId === categoryId) {
+                                    await remove(ref(database, `courses/${childSnapshot.key}`));
+                                }
+                            });
+                        }, { onlyOnce: true }); // Ensure this only runs once to avoid infinite loops
+                        
+                        showMessage(categoryMessage, 'Category and associated courses deleted successfully!', 'success');
+                    } catch (error) {
+                        showMessage(categoryMessage, `Failed to delete category: ${error.message}`, 'error');
+                        console.error("Delete category error:", error);
+                    }
+                }
+            }
+        });
+
+        // Add Course
+        addCourseBtn.addEventListener('click', async () => {
+            const title = courseTitleInput.value.trim();
+            const description = courseDescriptionInput.value.trim();
+            const url = courseUrlInput.value.trim();
+            const categoryId = courseCategorySelect.value;
+            const categoryName = courseCategorySelect.options[courseCategorySelect.selectedIndex].text;
+
+            if (!title || !url || !categoryId) {
+                showMessage(courseMessage, 'Course title, link, and category cannot be empty.', 'error');
+                return;
+            }
+
+            try {
+                const coursesRef = ref(database, 'courses');
+                await push(coursesRef, {
+                    title: title,
+                    description: description,
+                    url: url,
+                    categoryId: categoryId,
+                    categoryName: categoryName, // Store name for easier display
+                    createdAt: new Date().toISOString()
+                });
+                showMessage(courseMessage, 'Course added successfully!', 'success');
+                courseTitleInput.value = '';
+                courseDescriptionInput.value = '';
+                courseUrlInput.value = '';
+                courseCategorySelect.value = ''; // Reset selection
+            } catch (error) {
+                showMessage(courseMessage, `Failed to add course: ${error.message}`, 'error');
+                console.error("Add course error:", error);
+            }
+        });
+
+        // Load Courses
+        const coursesRef = ref(database, 'courses');
+        onValue(coursesRef, (snapshot) => {
+            coursesList.innerHTML = '';
+            snapshot.forEach((childSnapshot) => {
+                const course = childSnapshot.val();
+                const courseId = childSnapshot.key;
+
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>
+                        <strong>${course.title}</strong> (${course.categoryName})<br>
+                        <small>${course.description || 'No description'}</small><br>
+                        <a href="${course.url}" target="_blank" style="color: var(--link-color); text-decoration: none;">${course.url}</a>
+                    </span>
+                    <button data-id="${courseId}">Delete</button>
+                `;
+                coursesList.appendChild(li);
+            });
+        });
+
+        // Delete Course
+        coursesList.addEventListener('click', async (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const courseId = e.target.dataset.id;
+                if (confirm('Are you sure you want to delete this course?')) {
+                    try {
+                        await remove(ref(database, `courses/${courseId}`));
+                        showMessage(courseMessage, 'Course deleted successfully!', 'success');
+                    } catch (error) {
+                        showMessage(courseMessage, `Failed to delete course: ${error.message}`, 'error');
+                        console.error("Delete course error:", error);
+                    }
+                }
+            }
+        });
+
+        // --- Utility function for messages ---
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `status-message ${type}`;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000); // Hide after 3 seconds
+        }
+    </script>
+</body>
+</html>
